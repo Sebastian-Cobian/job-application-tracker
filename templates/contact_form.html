@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if mode == 'edit' else 'Add' }} Contact{% endblock %}
+{% block content %}
+<div class="page-head">
+    <h1>{{ 'Edit ' ~ contact.contact_name if mode == 'edit' else 'Add Contact' }}</h1>
+</div>
+
+<form method="post" class="card form">
+    <div class="form-grid">
+        <label><span>Contact Name <span class="req">*</span></span>
+            <input type="text" name="contact_name" maxlength="100" required value="{{ contact.contact_name or '' }}">
+        </label>
+        <label><span>Company <span class="req">*</span></span>
+            <select name="company_id" required>
+                <option value="">— Select a company —</option>
+                {% for c in companies %}
+                    <option value="{{ c.company_id }}" {{ 'selected' if c.company_id|string == contact.company_id|string }}>{{ c.company_name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Title
+            <input type="text" name="title" maxlength="100" value="{{ contact.title or '' }}" placeholder="e.g. Technical Recruiter">
+        </label>
+        <label>Email
+            <input type="email" name="email" maxlength="100" value="{{ contact.email or '' }}">
+        </label>
+        <label>Phone
+            <input type="tel" name="phone" maxlength="20" value="{{ contact.phone or '' }}" placeholder="305-555-0100">
+        </label>
+        <label>LinkedIn URL
+            <input type="url" name="linkedin_url" maxlength="200" value="{{ contact.linkedin_url or '' }}" placeholder="https://www.linkedin.com/in/…">
+        </label>
+        <label class="span-2">Notes
+            <textarea name="notes" rows="4">{{ contact.notes or '' }}</textarea>
+        </label>
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ 'Save Changes' if mode == 'edit' else 'Add Contact' }}</button>
+        <a href="{{ url_for('contact_detail', contact_id=contact.contact_id) if mode == 'edit' else url_for('contacts') }}" class="btn btn-link">Cancel</a>
+    </div>
+</form>
+{% endblock %}

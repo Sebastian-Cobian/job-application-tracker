@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% from "_macros.html" import delete_button, search_bar %}
+{% block title %}Contacts{% endblock %}
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>Contacts</h1>
+        <p class="muted">{{ contacts|length }} contact{{ 's' if contacts|length != 1 }}</p>
+    </div>
+    <a href="{{ url_for('contact_new') }}" class="btn btn-primary">+ Add Contact</a>
+</div>
+
+{{ search_bar('contacts', search, 'Search name, title, company, email…') }}
+
+{% if contacts %}
+<div class="card table-wrap">
+    <table>
+        <thead>
+            <tr><th>Name</th><th>Title</th><th>Company</th><th>Email</th><th>Phone</th><th>LinkedIn</th><th></th></tr>
+        </thead>
+        <tbody>
+        {% for ct in contacts %}
+            <tr>
+                <td><a href="{{ url_for('contact_detail', contact_id=ct.contact_id) }}"><strong>{{ ct.contact_name }}</strong></a></td>
+                <td>{{ ct.title or '—' }}</td>
+                <td><a href="{{ url_for('company_detail', company_id=ct.company_id) }}">{{ ct.company_name }}</a></td>
+                <td>{% if ct.email %}<a href="mailto:{{ ct.email }}">{{ ct.email }}</a>{% else %}—{% endif %}</td>
+                <td class="nowrap">{{ ct.phone or '—' }}</td>
+                <td>{% if ct.linkedin_url %}<a href="{{ ct.linkedin_url }}" target="_blank" rel="noopener">Profile ↗</a>{% else %}—{% endif %}</td>
+                <td class="row-actions">
+                    <a href="{{ url_for('contact_edit', contact_id=ct.contact_id) }}" class="btn btn-secondary btn-sm">Edit</a>
+                    {{ delete_button(url_for('contact_delete', contact_id=ct.contact_id), 'Delete contact ' ~ ct.contact_name ~ '?', small=true) }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card empty">
+    <p>{{ 'No contacts match your search.' if search else 'No contacts yet.' }}</p>
+    <a href="{{ url_for('contact_new') }}" class="btn btn-primary">Add a Contact</a>
+</div>
+{% endif %}
+{% endblock %}
