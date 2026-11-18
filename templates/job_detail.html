@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% from "_macros.html" import delete_button, status_badge, ext_link, skill_chips %}
+{% block title %}{{ job.job_title }}{% endblock %}
+{% block content %}
+<p class="breadcrumb"><a href="{{ url_for('jobs') }}">Jobs</a> / {{ job.job_title }}</p>
+<div class="page-head">
+    <div>
+        <h1>{{ job.job_title }}</h1>
+        <p class="muted">at <a href="{{ url_for('company_detail', company_id=job.company_id) }}">{{ job.company_name }}</a></p>
+    </div>
+    <div class="actions">
+        <a href="{{ url_for('application_new', job_id=job.job_id) }}" class="btn btn-primary">+ Apply / Log Application</a>
+        <a href="{{ url_for('job_edit', job_id=job.job_id) }}" class="btn btn-secondary">Edit</a>
+        {{ delete_button(url_for('job_delete', job_id=job.job_id),
+            'Delete ' ~ job.job_title ~ '? This also deletes ' ~ applications|length ~ ' application(s).') }}
+    </div>
+</div>
+
+<div class="grid-2">
+    <section class="card">
+        <h2>Details</h2>
+        <dl class="details">
+            <dt>Company</dt><dd>{{ job.company_name }}</dd>
+            <dt>Type</dt><dd><span class="badge type">{{ job.job_type or '—' }}</span></dd>
+            <dt>Salary</dt><dd>{{ job.salary_min|money }} – {{ job.salary_max|money }}</dd>
+            <dt>Posted</dt><dd>{{ job.date_posted|fmtdate }}</dd>
+            <dt>Posting</dt><dd>{{ ext_link(job.job_url) }}</dd>
+        </dl>
+    </section>
+    <section class="card">
+        <h2>Requirements</h2>
+        <dl class="details">
+            <dt>Skills</dt><dd class="chips">{{ skill_chips(job.skills) }}</dd>
+            <dt>Experience</dt><dd>{{ (job.requirements.experience_years ~ ' year(s)') if job.requirements.experience_years is defined else '—' }}</dd>
+            <dt>Education</dt><dd>{{ job.requirements.education or '—' }}</dd>
+        </dl>
+        <details class="json">
+            <summary>View raw JSON</summary>
+            <pre>{{ job.requirements|tojson(indent=2) }}</pre>
+        </details>
+    </section>
+</div>
+
+<section class="card">
+    <h2>Applications ({{ applications|length }})</h2>
+    {% if applications %}
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Applied</th><th>Status</th><th>Resume</th><th>Interviews</th></tr></thead>
+            <tbody>
+            {% for a in applications %}
+                <tr>
+                    <td><a href="{{ url_for('application_detail', application_id=a.application_id) }}">{{ a.application_date|fmtdate }}</a></td>
+                    <td>{{ status_badge(a.status) }}</td>
+                    <td>{{ a.resume_version or '—' }}</td>
+                    <td>{{ a.interviews|length }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="muted">No application logged for this job yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if mode == 'edit' else 'Add' }} Job{% endblock %}
+{% block content %}
+<div class="page-head">
+    <h1>{{ 'Edit ' ~ job.job_title if mode == 'edit' else 'Add Job' }}</h1>
+</div>
+
+<form method="post" class="card form">
+    <div class="form-grid">
+        <label><span>Company <span class="req">*</span></span>
+            <select name="company_id" required>
+                <option value="">— Select a company —</option>
+                {% for c in companies %}
+                    <option value="{{ c.company_id }}" {{ 'selected' if c.company_id|string == job.company_id|string }}>{{ c.company_name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label><span>Job Title <span class="req">*</span></span>
+            <input type="text" name="job_title" maxlength="100" required value="{{ job.job_title or '' }}">
+        </label>
+        <label>Job Type
+            <select name="job_type">
+                {% for t in JOB_TYPES %}<option value="{{ t }}" {{ 'selected' if t == job.job_type }}>{{ t }}</option>{% endfor %}
+            </select>
+        </label>
+        <label>Date Posted
+            <input type="date" name="date_posted" value="{{ job.date_posted or '' }}">
+        </label>
+        <label>Minimum Salary ($)
+            <input type="number" name="salary_min" min="0" step="1000" value="{{ job.salary_min if job.salary_min is not none else '' }}">
+        </label>
+        <label>Maximum Salary ($)
+            <input type="number" name="salary_max" min="0" step="1000" value="{{ job.salary_max if job.salary_max is not none else '' }}">
+        </label>
+        <label class="span-2">Job Posting URL
+            <input type="url" name="job_url" maxlength="300" value="{{ job.job_url or '' }}" placeholder="https://…">
+        </label>
+    </div>
+
+    <fieldset>
+        <legend>Requirements <span class="muted small">(stored as JSON)</span></legend>
+        <div class="form-grid">
+            <label class="span-2">Required Skills
+                <input type="text" name="skills" value="{{ job.skills or '' }}" placeholder="Python, SQL, Flask">
+                <span class="hint">Separate skills with commas. These are used by the Job Match feature.</span>
+            </label>
+            <label>Years of Experience
+                <input type="number" name="experience_years" min="0" max="50" value="{{ job.experience_years if job.experience_years is not none else '' }}">
+            </label>
+            <label>Education
+                <input type="text" name="education" maxlength="100" value="{{ job.education or '' }}" placeholder="e.g. Bachelor's">
+            </label>
+        </div>
+    </fieldset>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ 'Save Changes' if mode == 'edit' else 'Add Job' }}</button>
+        <a href="{{ url_for('job_detail', job_id=job.job_id) if mode == 'edit' else url_for('jobs') }}" class="btn btn-link">Cancel</a>
+    </div>
+</form>
+{% endblock %}
