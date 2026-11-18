@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% from "_macros.html" import delete_button, status_badge, skill_chips %}
+{% block title %}Application — {{ application.job_title }}{% endblock %}
+{% block content %}
+<p class="breadcrumb"><a href="{{ url_for('applications') }}">Applications</a> / {{ application.job_title }}</p>
+<div class="page-head">
+    <div>
+        <h1>{{ application.job_title }} {{ status_badge(application.status) }}</h1>
+        <p class="muted">at <a href="{{ url_for('company_detail', company_id=application.company_id) }}">{{ application.company_name }}</a>
+           · applied {{ application.application_date|fmtdate }}</p>
+    </div>
+    <div class="actions">
+        <a href="{{ url_for('application_edit', application_id=application.application_id) }}" class="btn btn-secondary">Edit</a>
+        {{ delete_button(url_for('application_delete', application_id=application.application_id),
+            'Delete this application for ' ~ application.job_title ~ '?') }}
+    </div>
+</div>
+
+<div class="grid-2">
+    <section class="card">
+        <h2>Application</h2>
+        <dl class="details">
+            <dt>Job</dt><dd><a href="{{ url_for('job_detail', job_id=application.job_id) }}">{{ application.job_title }}</a> ({{ application.job_type }})</dd>
+            <dt>Applied</dt><dd>{{ application.application_date|fmtdate }}</dd>
+            <dt>Status</dt><dd>{{ status_badge(application.status) }}</dd>
+            <dt>Resume</dt><dd>{{ application.resume_version or '—' }}</dd>
+            <dt>Cover Letter</dt><dd>{{ 'Sent' if application.cover_letter_sent else 'Not sent' }}</dd>
+            {% if job %}<dt>Skills</dt><dd class="chips">{{ skill_chips(job.skills) }}</dd>{% endif %}
+        </dl>
+    </section>
+
+    <section class="card">
+        <h2>Contacts at {{ application.company_name }}</h2>
+        <ul class="list">
+            {% for ct in contacts %}
+                <li>
+                    <a href="{{ url_for('contact_detail', contact_id=ct.contact_id) }}">{{ ct.contact_name }}</a>
+                    <span class="muted small">{{ ct.title or '' }}{% if ct.email %} · <a href="mailto:{{ ct.email }}">{{ ct.email }}</a>{% endif %}</span>
+                </li>
+            {% else %}
+                <li class="muted">No contacts saved. <a href="{{ url_for('contact_new', company_id=application.company_id) }}">Add one</a></li>
+            {% endfor %}
+        </ul>
+    </section>
+</div>
+
+<section class="card">
+    <h2>Interviews ({{ application.interviews|length }})</h2>
+    {% if application.interviews %}
+        <ol class="timeline">
+            {% for iv in application.interviews %}
+                <li class="{{ 'upcoming' if iv.date >= today }}">
+                    <div class="timeline-date">{{ iv.date|fmtdate }}{% if iv.date >= today %} <span class="badge status-screening">Upcoming</span>{% endif %}</div>
+                    <div><strong>{{ iv.type or 'Interview' }}</strong>{% if iv.interviewer %} with {{ iv.interviewer }}{% endif %}</div>
+                    {% if iv.notes %}<div class="muted">{{ iv.notes }}</div>{% endif %}
+                </li>
+            {% endfor %}
+        </ol>
+    {% else %}
+        <p class="muted">No interviews recorded. <a href="{{ url_for('application_edit', application_id=application.application_id) }}">Add one</a></p>
+    {% endif %}
+    <details class="json">
+        <summary>View raw interview_data JSON</summary>
+        <pre>{{ {'interviews': application.interviews}|tojson(indent=2) }}</pre>
+    </details>
+</section>
+{% endblock %}

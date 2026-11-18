@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if mode == 'edit' else 'Add' }} Application{% endblock %}
+{% block content %}
+<div class="page-head">
+    <h1>{{ 'Edit Application' if mode == 'edit' else 'Add Application' }}</h1>
+</div>
+
+<form method="post" class="card form">
+    <div class="form-grid">
+        <label class="span-2"><span>Job <span class="req">*</span></span>
+            <select name="job_id" required>
+                <option value="">— Select a job —</option>
+                {% for j in jobs %}
+                    <option value="{{ j.job_id }}" {{ 'selected' if j.job_id|string == application.job_id|string }}>{{ j.company_name }} — {{ j.job_title }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label><span>Application Date <span class="req">*</span></span>
+            <input type="date" name="application_date" required max="{{ today }}" value="{{ application.application_date or '' }}">
+        </label>
+        <label><span>Status <span class="req">*</span></span>
+            <select name="status" required>
+                {% for s in APPLICATION_STATUSES %}<option value="{{ s }}" {{ 'selected' if s == application.status }}>{{ s }}</option>{% endfor %}
+            </select>
+        </label>
+        <label>Resume Version
+            <input type="text" name="resume_version" maxlength="50" value="{{ application.resume_version or '' }}" placeholder="e.g. v3-software">
+        </label>
+        <label class="checkbox">
+            <input type="checkbox" name="cover_letter_sent" {{ 'checked' if application.cover_letter_sent }}>
+            Cover letter sent
+        </label>
+    </div>
+
+    <fieldset>
+        <legend>Interviews <span class="muted small">(stored as JSON — leave a row blank to skip it)</span></legend>
+        {% set rows = (application.interviews or []) + [{}, {}] %}
+        <div class="interview-rows">
+            <div class="interview-row interview-head">
+                <span>Date</span><span>Type</span><span>Interviewer</span><span>Notes</span>
+            </div>
+            {% for iv in rows %}
+                <div class="interview-row">
+                    <input type="date" name="interview_date" value="{{ iv.date or '' }}" aria-label="Interview date">
+                    <input type="text" name="interview_type" maxlength="50" value="{{ iv.type or '' }}" list="interview-types" placeholder="e.g. Phone Screen" aria-label="Interview type">
+                    <input type="text" name="interviewer" maxlength="100" value="{{ iv.interviewer or '' }}" placeholder="Name" aria-label="Interviewer">
+                    <input type="text" name="interview_notes" maxlength="1000" value="{{ iv.notes or '' }}" placeholder="Notes" aria-label="Notes">
+                </div>
+            {% endfor %}
+        </div>
+        <datalist id="interview-types">
+            <option value="Recruiter Call"><option value="Phone Screen"><option value="Technical">
+            <option value="Behavioral"><option value="Onsite"><option value="Final Round">
+        </datalist>
+        <p class="hint">Need more rows? Save, then edit again — two blank rows are always added.</p>
+    </fieldset>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ 'Save Changes' if mode == 'edit' else 'Add Application' }}</button>
+        <a href="{{ url_for('application_detail', application_id=application.application_id) if mode == 'edit' else url_for('applications') }}" class="btn btn-link">Cancel</a>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% from "_macros.html" import delete_button, search_bar, status_badge %}
+{% block title %}Applications{% endblock %}
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>Applications</h1>
+        <p class="muted">{{ applications|length }} application{{ 's' if applications|length != 1 }}{{ ' with status ' ~ status if status }}</p>
+    </div>
+    <a href="{{ url_for('application_new') }}" class="btn btn-primary">+ Add Application</a>
+</div>
+
+{% call search_bar('applications', search, 'Search job, company, resume version…') %}
+    <select name="status">
+        <option value="">All statuses</option>
+        {% for s in APPLICATION_STATUSES %}<option value="{{ s }}" {{ 'selected' if s == status }}>{{ s }}</option>{% endfor %}
+    </select>
+{% endcall %}
+
+{% if applications %}
+<div class="card table-wrap">
+    <table>
+        <thead>
+            <tr><th>Job</th><th>Company</th><th>Applied</th><th>Status</th><th>Resume</th><th>Cover Letter</th><th class="num">Interviews</th><th></th></tr>
+        </thead>
+        <tbody>
+        {% for a in applications %}
+            <tr>
+                <td><a href="{{ url_for('application_detail', application_id=a.application_id) }}"><strong>{{ a.job_title }}</strong></a></td>
+                <td><a href="{{ url_for('company_detail', company_id=a.company_id) }}">{{ a.company_name }}</a></td>
+                <td class="nowrap">{{ a.application_date|fmtdate }}</td>
+                <td>{{ status_badge(a.status) }}</td>
+                <td>{{ a.resume_version or '—' }}</td>
+                <td>{{ '✔ Yes' if a.cover_letter_sent else 'No' }}</td>
+                <td class="num">{{ a.interviews|length }}</td>
+                <td class="row-actions">
+                    <a href="{{ url_for('application_edit', application_id=a.application_id) }}" class="btn btn-secondary btn-sm">Edit</a>
+                    {{ delete_button(url_for('application_delete', application_id=a.application_id),
+                        'Delete your application for ' ~ a.job_title ~ ' at ' ~ a.company_name ~ '?', small=true) }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card empty">
+    <p>{{ 'No applications match your filters.' if request.args else 'No applications yet.' }}</p>
+    <a href="{{ url_for('application_new') }}" class="btn btn-primary">Add an Application</a>
+</div>
+{% endif %}
+{% endblock %}
