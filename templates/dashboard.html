@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>Dashboard</h1>
+        <p class="muted">An overview of your job search.</p>
+    </div>
+    <div class="actions">
+        <a href="{{ url_for('application_new') }}" class="btn btn-primary">+ New Application</a>
+        <a href="{{ url_for('job_match') }}" class="btn btn-secondary">Find Matching Jobs</a>
+    </div>
+</div>
+
+<section class="stat-grid">
+    <a class="stat" href="{{ url_for('applications') }}">
+        <span class="stat-label">Applications</span>
+        <span class="stat-value">{{ stats.applications }}</span>
+        <span class="stat-sub">{{ stats.active }} active</span>
+    </a>
+    <a class="stat" href="{{ url_for('jobs') }}">
+        <span class="stat-label">Jobs Tracked</span>
+        <span class="stat-value">{{ stats.jobs }}</span>
+        <span class="stat-sub">avg. salary {{ stats.avg_salary|money }}</span>
+    </a>
+    <a class="stat" href="{{ url_for('companies') }}">
+        <span class="stat-label">Companies</span>
+        <span class="stat-value">{{ stats.companies }}</span>
+        <span class="stat-sub">{{ stats.contacts }} contacts</span>
+    </a>
+    <div class="stat">
+        <span class="stat-label">Response Rate</span>
+        <span class="stat-value">{{ stats.response_rate }}%</span>
+        <span class="stat-sub">{{ stats.offers }} offer{{ 's' if stats.offers != 1 }}</span>
+    </div>
+</section>
+
+<div class="grid-2">
+    <section class="card">
+        <h2>Applications by Status</h2>
+        <div class="bars">
+            {% for status, total in by_status.items() %}
+                <a class="bar-row" href="{{ url_for('applications', status=status) }}">
+                    <span class="bar-label">{{ status }}</span>
+                    <span class="bar-track">
+                        <span class="bar-fill status-bg-{{ status|lower }}" style="width: {{ (total / max_status * 100)|round(0) }}%"></span>
+                    </span>
+                    <span class="bar-value">{{ total }}</span>
+                </a>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Upcoming Interviews</h2>
+        {% if upcoming %}
+            <ul class="list">
+                {% for iv in upcoming %}
+                    <li>
+                        <div>
+                            <strong>{{ iv.date|fmtdate }}</strong> · {{ iv.type or 'Interview' }}
+                            <div class="muted small">
+                                <a href="{{ url_for('application_detail', application_id=iv.application.application_id) }}">
+                                    {{ iv.application.job_title }} at {{ iv.application.company_name }}
+                                </a>
+                                {% if iv.interviewer %} — with {{ iv.interviewer }}{% endif %}
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="muted">No upcoming interviews scheduled.</p>
+        {% endif %}
+
+        <h2 class="mt">Jobs by Type</h2>
+        <div class="chips">
+            {% for row in jobs_by_type %}
+                <a class="chip" href="{{ url_for('jobs', type=row.job_type) }}">{{ row.job_type }} · {{ row.total }}</a>
+            {% else %}
+                <span class="muted">No jobs yet.</span>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+<section class="card">
+    <div class="card-head">
+        <h2>Recent Applications</h2>
+        <a href="{{ url_for('applications') }}" class="btn btn-link">View all →</a>
+    </div>
+    {% if recent %}
+        <div class="table-wrap">
+        <table>
+            <thead><tr><th>Job</th><th>Company</th><th>Applied</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for a in recent %}
+                <tr>
+                    <td><a href="{{ url_for('application_detail', application_id=a.application_id) }}">{{ a.job_title }}</a></td>
+                    <td>{{ a.company_name }}</td>
+                    <td>{{ a.application_date|fmtdate }}</td>
+                    <td>{{ status_badge(a.status) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    {% else %}
+        <p class="muted">No applications yet. <a href="{{ url_for('application_new') }}">Add your first one.</a></p>
+    {% endif %}
+</section>
+{% endblock %}
