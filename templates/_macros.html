@@ -1,0 +1,29 @@
+{# Reusable template pieces #}
+
+{% macro status_badge(status) -%}
+    <span class="badge status-{{ status|lower }}">{{ status }}</span>
+{%- endmacro %}
+
+{% macro delete_button(action, message, label='Delete', small=false) -%}
+    <form method="post" action="{{ action }}" class="inline-form"
+          onsubmit="return confirm({{ message|tojson|forceescape }});">
+        <button type="submit" class="btn btn-danger{{ ' btn-sm' if small }}">{{ label }}</button>
+    </form>
+{%- endmacro %}
+
+{% macro search_bar(endpoint, search, placeholder) -%}
+    <form method="get" action="{{ url_for(endpoint) }}" class="filters">
+        <input type="search" name="q" value="{{ search }}" placeholder="{{ placeholder }}">
+        {{ caller() if caller }}
+        <button type="submit" class="btn btn-secondary">Filter</button>
+        {% if request.args %}<a href="{{ url_for(endpoint) }}" class="btn btn-link">Clear</a>{% endif %}
+    </form>
+{%- endmacro %}
+
+{% macro ext_link(url) -%}
+    {% if url %}<a href="{{ url }}" target="_blank" rel="noopener">{{ url|replace('https://', '')|replace('http://', '')|truncate(40, true) }}</a>{% else %}—{% endif %}
+{%- endmacro %}
+
+{% macro skill_chips(skills, cls='') -%}
+    {% for s in skills %}<span class="chip {{ cls }}">{{ s }}</span>{% else %}<span class="muted">None listed</span>{% endfor %}
+{%- endmacro %}

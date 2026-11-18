@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Error {{ code }}{% endblock %}
+{% block content %}
+<section class="card empty">
+    <h1>Error {{ code }}</h1>
+    <p>{{ message }}</p>
+    {% if detail %}<pre class="error-detail">{{ detail }}</pre>{% endif %}
+    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+</section>
+{% endblock %}

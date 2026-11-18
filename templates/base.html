@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Job Tracker{% endblock %} · Job Application Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% set nav = [
+        ('dashboard', 'Dashboard'),
+        ('companies', 'Companies'),
+        ('jobs', 'Jobs'),
+        ('applications', 'Applications'),
+        ('contacts', 'Contacts'),
+        ('job_match', 'Job Match'),
+    ] %}
+    {% set section = request.endpoint.split('_')[0] if request.endpoint else '' %}
+    <header class="topbar">
+        <div class="container topbar-inner">
+            <a class="brand" href="{{ url_for('dashboard') }}">
+                <span class="brand-mark">JT</span> Job Tracker
+            </a>
+            <nav class="nav">
+                {% for endpoint, label in nav %}
+                    {% set active = request.endpoint == endpoint
+                        or (endpoint == 'companies' and section == 'company')
+                        or (endpoint == 'jobs' and section == 'job' and request.endpoint != 'job_match')
+                        or (endpoint == 'applications' and section == 'application')
+                        or (endpoint == 'contacts' and section == 'contact') %}
+                    <a href="{{ url_for(endpoint) }}" class="{{ 'active' if active }}">{{ label }}</a>
+                {% endfor %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flashes">
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">Job Application Tracker · Flask + MySQL</div>
+    </footer>
+</body>
+</html>
