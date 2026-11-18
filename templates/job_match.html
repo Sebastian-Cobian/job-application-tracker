@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% from "_macros.html" import skill_chips %}
+{% block title %}Job Match{% endblock %}
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>Job Match</h1>
+        <p class="muted">Enter your skills to see which saved jobs fit you best, ranked by match percentage.</p>
+    </div>
+</div>
+
+<form method="get" class="card form match-form">
+    <label>Your Skills
+        <input type="text" name="skills" value="{{ skills_text }}" placeholder="Python, SQL, Flask" autofocus required>
+        <span class="hint">Comma-separated. Matching is case-insensitive and understands common abbreviations (JS → JavaScript, Postgres → PostgreSQL).</span>
+    </label>
+    <label class="min-label">Minimum match
+        <select name="min">
+            {% for m in [0, 25, 50, 75, 100] %}<option value="{{ m }}" {{ 'selected' if m == min_percent }}>{{ m }}%</option>{% endfor %}
+        </select>
+    </label>
+    <button type="submit" class="btn btn-primary">Find Matches</button>
+    {% if popular %}
+        <div class="popular">
+            <span class="muted small">Most requested skills:</span>
+            {% for s in popular %}<span class="chip">{{ s }}</span>{% endfor %}
+        </div>
+    {% endif %}
+</form>
+
+{% if results is not none %}
+    <section class="card">
+        <div class="card-head">
+            <h2>Matching Jobs</h2>
+            <span class="muted">Your skills: {{ user_skills|join(', ') }}</span>
+        </div>
+        {% if results %}
+            <ol class="match-list">
+                {% for r in results %}
+                    {% set level = 'high' if r.percent >= 75 else ('mid' if r.percent >= 50 else 'low') %}
+                    <li class="match">
+                        <div class="match-rank">{{ loop.index }}</div>
+                        <div class="match-body">
+                            <div class="match-title">
+                                <a href="{{ url_for('job_detail', job_id=r.job.job_id) }}"><strong>{{ r.job.job_title }}</strong></a>
+                                at <a href="{{ url_for('company_detail', company_id=r.job.company_id) }}">{{ r.job.company_name }}</a>
+                                <span class="muted small">· {{ r.job.job_type }} · {{ r.job.salary_min|money }}–{{ r.job.salary_max|money }}</span>
+                            </div>
+                            <div class="meter"><span class="meter-fill {{ level }}" style="width: {{ r.percent }}%"></span></div>
+                            <div class="match-skills">
+                                {% if r.matched %}<span class="small">Have:</span> {{ skill_chips(r.matched, 'chip-yes') }}{% endif %}
+                                {% if r.missing %}<span class="small">Missing:</span> {{ skill_chips(r.missing, 'chip-no') }}{% endif %}
+                            </div>
+                        </div>
+                        <div class="match-score {{ level }}">
+                            <span class="match-pct">{{ r.percent }}%</span>
+                            <span class="small">{{ r.matched_count }}/{{ r.total }} skills</span>
+                            {% if r.job.application_count %}
+                                <span class="badge status-applied">Applied</span>
+                            {% else %}
+                                <a href="{{ url_for('application_new', job_id=r.job.job_id) }}" class="btn btn-secondary btn-sm">Apply</a>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ol>
+        {% else %}
+            <p class="muted">No jobs reached a {{ min_percent }}% match. Try lowering the minimum or adding more skills.</p>
+        {% endif %}
+    </section>
+{% endif %}
+{% endblock %}
