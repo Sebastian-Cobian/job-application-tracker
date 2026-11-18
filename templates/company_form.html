@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if mode == 'edit' else 'Add' }} Company{% endblock %}
+{% block content %}
+<div class="page-head">
+    <h1>{{ 'Edit ' ~ company.company_name if mode == 'edit' else 'Add Company' }}</h1>
+</div>
+
+<form method="post" class="card form">
+    <div class="form-grid">
+        <label class="span-2"><span>Company Name <span class="req">*</span></span>
+            <input type="text" name="company_name" maxlength="100" required value="{{ company.company_name or '' }}">
+        </label>
+        <label>Industry
+            <input type="text" name="industry" maxlength="50" value="{{ company.industry or '' }}" placeholder="e.g. Software">
+        </label>
+        <label>Website
+            <input type="url" name="website" maxlength="200" value="{{ company.website or '' }}" placeholder="https://…">
+        </label>
+        <label>City
+            <input type="text" name="city" maxlength="50" value="{{ company.city or '' }}">
+        </label>
+        <label>State
+            <input type="text" name="state" maxlength="50" value="{{ company.state or '' }}" placeholder="e.g. FL">
+        </label>
+        <label class="span-2">Notes
+            <textarea name="notes" rows="4">{{ company.notes or '' }}</textarea>
+        </label>
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ 'Save Changes' if mode == 'edit' else 'Add Company' }}</button>
+        <a href="{{ url_for('company_detail', company_id=company.company_id) if mode == 'edit' else url_for('companies') }}" class="btn btn-link">Cancel</a>
+    </div>
+</form>
+{% endblock %}
