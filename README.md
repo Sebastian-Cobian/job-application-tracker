@@ -25,7 +25,7 @@ Other details:
 ## Project Structure
 
 ```
-job_tracker/
+job-application-tracker/
 ├── app.py               # Flask routes, form validation, Job Match algorithm
 ├── database.py          # MySQL connection + all SQL queries (CRUD for each table)
 ├── schema.sql           # Creates the job_tracker database, 4 tables, and sample data
@@ -86,8 +86,8 @@ All foreign keys use `ON DELETE CASCADE`, so deleting a company removes its jobs
 ### 2. Clone the repository
 
 ```bash
-git clone <your-repo-url>
-cd job_tracker
+git clone https://github.com/Sebastian-Cobian/job-application-tracker.git
+cd job-application-tracker
 ```
 
 ### 3. Create a virtual environment and install dependencies
