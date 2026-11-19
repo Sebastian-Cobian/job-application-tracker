@@ -16,7 +16,7 @@ this reflection.
 | Tool | Used for |
 |------|----------|
 | Claude (Claude Code) | Generating the initial application and documentation, end-to-end testing, fixing UI issues |
-| *(add any others, e.g. ChatGPT to explain an error)* | |
+| ChatGPT |Suggestions for the video demonstration, i.e what aspects of the application should I make sure to highlight in my video |
 
 ## Key Prompts
 
@@ -24,7 +24,7 @@ this reflection.
    *"Please help me complete this course project for a job application tracker using the information I have provided here."*
 2. **GitHub setup:** asked Claude to push the project to my existing course repository, keeping my earlier commits.
 3. **Documentation:** asked Claude to tighten the wording of this file.
-4. *(add prompts you use from here on, e.g. "Explain how `rank_jobs` sorts the results" or "Help me add a deadline field to jobs")*
+4. *Asked Claude for guidance on creating a copy of the project on my own computer so I could run the site for the video*
 
 ## What AI Generated
 
