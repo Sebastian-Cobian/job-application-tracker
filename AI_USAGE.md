@@ -51,11 +51,15 @@ Fixed during AI testing:
 - Required-field asterisks wrapped onto their own line (a CSS flexbox issue), so the label markup was fixed.
 - A placeholder in empty interview rows ("Phone Screen") looked like saved data, so it was changed to "e.g. Phone Screen".
 
-My own changes:
-- *(list each change you make yourself: what you changed and why)*
-
 ## Lessons Learned
 
-*(Write this section yourself. Some questions to answer: What did you learn about Flask, MySQL, or JSON
-columns from reading the generated code? What did you have to look up or ask about to understand it?
-Where did the AI's output need human judgment? What would you do differently next time?)*
+This was my first project where I worked on both backend and frontend development. Through this project, I was able to learn 
+how Flask and MySQL work together, and why each of them is necessary to make the whole application work. Before this, I had only
+written code in a terminal or an IDE but had not worked with databases or front-end languages such as CSS, HTTP, or JavaScript.
+This project showed me how all of these aspects work to create a functioning application, opening my eyes to the fact that computer science
+and building functioning applications is much more than just coding with Python or Java in an IDE. 
+
+While AI was certainly a useful tool that helped me create this application, it still required my human inspection. I did not take the code
+it generated for granted, but rather ensured that it was following the project instructions. Next time, I would try to use AI more sparingly
+and generate the code bit by bit as I went along rather than generating large amounts of code at once.
+
